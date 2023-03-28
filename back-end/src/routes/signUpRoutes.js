@@ -12,7 +12,7 @@ export const signUpRoute = {
         const db = getDbConnection('react-auth-db');
         try {
             console.log('Find User');
-            const user = await findUserByEmail(db, email);
+            user = await findUserByEmail(db, email);
             console.log(user);
 
         } catch(err) {
