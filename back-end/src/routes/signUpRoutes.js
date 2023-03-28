@@ -1,4 +1,4 @@
-import { getDbConnection, findOneListingByName } from "../db";
+import { getDbConnection, findUserByEmail, createUser } from "../db";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -8,16 +8,12 @@ export const signUpRoute = {
     handler: async (req, res) => {
         const {email, password} = req.body;
         let user;
-        let db;
+        console.log('DB connection');
+        const db = getDbConnection('react-auth-db');
         try {
-            console.log('DB connection');
-            db = getDbConnection('sample_training');
-            console.log('DB collection');
-             // Make the appropriate DB calls
-        await  listDatabases(client);
-            // user = await db.collection('users').findOne({email});
-        const user = await findOneListingByName(client, "ACMAR");
-        console.log(user);
+            console.log('Find User');
+            const user = await findUserByEmail(db, email);
+            console.log(user);
 
         } catch(err) {
             console.log('Error is: '+ err);
@@ -25,6 +21,7 @@ export const signUpRoute = {
         console.log('user'+ user)
 
         if(user) {
+            console.error("User already exists");
             res.sendStatus(409);
         }
 
@@ -36,7 +33,7 @@ export const signUpRoute = {
             bio: ''
         };
 
-        const result = await db.collection('users').insertOne({
+        const result = await createUser(db, {
             email,
             passwordHash,
             info: startingInfo,
@@ -56,8 +53,10 @@ export const signUpRoute = {
         }, 
         (err, token) => {
             if(err) {
+                console.error("There's an error"+ err);
                 return res.status(500).send(err);
             }
+            console.log("Success! Sending token"+ token);
             res.status(200).json({token});
         });
     }

@@ -24,7 +24,7 @@ export const initializeDbConnection = async () => {
         // Make the appropriate DB calls
         await  listDatabases(client);
 
-        const user = await findOneListingByName(client, "ALPINE");
+        const user = await findUserByEmail(client.db("react-auth-db"), "abc@gmail.com");
         // const db = getDbConnection('sample_trainings');
         // const user = await db.collection('zips').findOne({city: 'ALPINE'});
         console.log(user);
@@ -36,25 +36,33 @@ export const initializeDbConnection = async () => {
 
 // initializeDbConnection().catch(console.error);
 
-async function findOneListingByName(client, nameOfListing) {
-    const listing = await client.db("sample_training").collection("zips")
-        .findOne({city: nameOfListing});
-
-    if(listing) {
-        console.log(`Found a listing with a name of ${nameOfListing} /n`);
-        console.log(listing);
+export const findUserByEmail = async (db, email) => {
+    const user = await db.collection("users")
+        .findOne({email: email});
+    
+    if(user) {
+        console.log(`Found a user with email of ${email} /n`);
+        console.log(user);
     } else {
-        console.log(`No Listing found with name of ${nameOfListing} `);
+        console.log(`No user found with email of ${email} `);
     }
+    return user;
+}
+
+export const createUser = async (db, userInfo) => {
+    const user = await db.collection("users")
+        .insertOne(userInfo);
+    console.log("New user creation successful /n");
+    console.log(user);
+    return user;
 }
 
 async function listDatabases(client){
     const databasesList = await client.db().admin().listDatabases();
  
     console.log("Databases:");
-    if(databasesList.length >= 1) {
-        databasesList?.databases?.forEach(db => console.log(` - ${db.name}`));
-    };
+    databasesList?.databases?.forEach(db => console.log(` - ${db.name}`));
+
 };
 
 
