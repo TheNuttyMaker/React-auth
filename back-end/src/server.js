@@ -22,6 +22,9 @@ routes.forEach(route => {
 // Connect to the database, then start the server.
 // This prevents us from having to create a new DB
 // connection for every request.
+
+// initializeDbConnection().catch(console.error);
+
 initializeDbConnection()
     .then(() => {
         app.listen(PORT, () => {
