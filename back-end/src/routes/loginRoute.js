@@ -1,15 +1,24 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { getDbConnection } from '../db';
+import { findUserByEmail, getDbConnection } from '../db';
 
 export const LoginRoute = {
     path: '/api/login',
     method: 'post',
     handler: async (req, res) => {
         const { email, password }= req.body;
-
+        let user;
+        console.log('DB connection');
         const db = getDbConnection('react-auth-db');
-        const user = await db.collection('users').findOne({email});
+        try {
+            console.log('Find User');
+            user = await findUserByEmail(db, email);
+            console.log(user);
+
+        } catch(err) {
+            console.log('Error is: '+ err);
+        }
+        console.log('user'+ user);
 
         if(!user) {
             return res.sendStatus(401);
