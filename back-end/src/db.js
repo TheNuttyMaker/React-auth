@@ -1,6 +1,5 @@
 // const { MongoClient } = require('mongodb');
-import { MongoClient } from 'mongodb';
-
+import { MongoClient, ObjectID } from 'mongodb';
 
 let client;
 
@@ -49,12 +48,22 @@ export const findUserByEmail = async (db, email) => {
     return user;
 }
 
-export const createUser = async (db, userInfo) => {
-    const user = await db.collection("users")
-        .insertOne(userInfo);
-    console.log("New user creation successful /n");
-    console.log(user);
+export const findAndUpdateUser = async (db, id, updates) => {
+    const user = await db.collection("users").findOneAndUpdate(
+        {_id: ObjectID(id)},
+        {$set: {info: updates}},
+        {returnOriginal: false},
+
+    );
+    console.log("Update Success!");
     return user;
+}
+
+export const createUser = async (db, userInfo) => {
+    const response = await db.collection("users").insertOne(userInfo);
+    console.log("New user creation successful /n");
+    console.log(response.value);
+    return response.value;
 }
 
 async function listDatabases(client){
